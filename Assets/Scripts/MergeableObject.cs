@@ -1,0 +1,75 @@
+﻿using UnityEngine;
+
+public class MergeableObject : MonoBehaviour
+{
+    public MergeableItemData ItemData;
+
+    public Vector2Int CurrentGridPosition;
+
+    private GridManager gridManager;
+    private Camera mainCamera;
+    private bool isDragging = false;
+
+    // Mouse ile sürüklerken objenin yerden ne kadar "havalanacağını" belirler.
+    private float dragYOffset = 0.8f;
+
+    // Mouse'un pozisyonunu 3D dünyaya çevirirken kullanacağımız sanal düzlem.
+    private Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+
+    void Start()
+    {
+        gridManager = GridManager.Instance;
+        mainCamera = Camera.main;
+
+        // 1. Başlangıç pozisyonunu bul
+        CurrentGridPosition = gridManager.WorldToGridPosition(transform.position);
+
+        // 2. Kendini GridManager'ın mantıksal grid'ine kaydet
+        gridManager.RegisterObject(this, CurrentGridPosition);
+    }
+
+    private void OnMouseDown()
+    {
+        isDragging = true;
+        
+        transform.position += new Vector3(0, dragYOffset, 0);
+    }
+
+    private void OnMouseDrag()
+    {
+        if (!isDragging) return;
+
+        
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+        
+        if (groundPlane.Raycast(ray, out float distance))
+        {
+            Vector3 worldPosition = ray.GetPoint(distance);
+
+            
+            transform.position = new Vector3(worldPosition.x, dragYOffset, worldPosition.z);
+        }
+    }
+
+    private void OnMouseUp()
+    {
+        if (!isDragging) return;
+        isDragging = false;
+
+        
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        Vector3 worldPositionOnDrop = transform.position; // Default
+        if (groundPlane.Raycast(ray, out float distance))
+        {
+            worldPositionOnDrop = ray.GetPoint(distance);
+        }
+
+        // 2. Bu dünya pozisyonunu en yakın grid koordinatına çevir
+        Vector2Int toPos = gridManager.WorldToGridPosition(worldPositionOnDrop);
+
+        // 3. GridManager'a "Ben bu objeyi 'CurrentGridPosition'dan
+        // 'toPos'a bırakıyorum, birleşme mi olacak, taşıma mı, karar ver" de.
+        gridManager.TryMergeOrPlace(this, CurrentGridPosition, toPos);
+    }
+}
