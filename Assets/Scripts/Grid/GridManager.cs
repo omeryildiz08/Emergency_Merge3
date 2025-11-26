@@ -62,72 +62,88 @@ public class GridManager : MonoBehaviour
     // MergeableObject.cs, OnMouseUp() fonksiyonunda burayı çağırır.
     public void TryMergeOrPlace(MergeableObject movingObject, Vector2Int fromPos, Vector2Int toPos)
     {
-        // 1. Gidilen yer geçerli bir tile mı? (Elle delikli harita yaptıysak?)
+        // 1. Gidilen yer geçerli mi?
         if (!IsValidPosition(toPos) || grid[toPos.x, toPos.y].TileView == null)
         {
-            // Geçerli değilse, objeyi eski yerine geri "snap" et (oturt).
             SnapObjectToPosition(movingObject, fromPos);
             return;
         }
 
-        // 2. Birleşme (Merge) kontrolü
-        List<MergeableObject> neighborsToMerge = FindNeighborsToMerge(toPos, movingObject.ItemData);
+        MergeableObject targetObj = grid[toPos.x, toPos.y].ObjectOnTile;
 
-        // Yeterli komşu bulundu mu? (En az 2 komşu + 1 bırakılan = 3'lü merge)
-        if (neighborsToMerge.Count >= 2)
+        // SENARYO 1: BAŞKA BİR OBJENİN ÜZERİNE BIRAKTIK (Merge Tetikleme)
+        if (targetObj != null && targetObj != movingObject)
         {
-            PerformMerge(movingObject, neighborsToMerge, toPos);
+            // Aynı tipteyse zinciri kontrol et
+            if (targetObj.ItemData == movingObject.ItemData)
+            {
+                // Hedef noktayı merkez alarak bağlı tüm grubu bul
+                // (movingObject henüz grid'de olmadığı için listeye manuel ekleyeceğiz)
+                List<MergeableObject> mergeGroup = FindMergeGroup(toPos, movingObject.ItemData);
+
+                if (!mergeGroup.Contains(movingObject)) mergeGroup.Add(movingObject);
+
+                if (mergeGroup.Count >= 3)
+                {
+                    PerformMerge(mergeGroup, toPos);
+                    return;
+                }
+            }
+            // Tip farklıysa veya sayı yetmediyse geri dön
+            SnapObjectToPosition(movingObject, fromPos);
         }
-        // 3. Taşıma (Move) kontrolü
-        else if (grid[toPos.x, toPos.y].IsEmpty)
-        {
-            // Bırakılan yer boşsa, objeyi oraya taşı
-            MoveObject(movingObject, fromPos, toPos);
-        }
-        // 4. Başarısız (Yer dolu ve merge yok)
+        // SENARYO 2: BOŞ BİR KAREYE BIRAKTIK (Taşıma ve Zincir Kontrolü)
         else
         {
-            // Gidilen yer doluysa, objeyi eski yerine geri "snap" et.
-            SnapObjectToPosition(movingObject, fromPos);
+            // Önce mantıksal olarak taşı
+            ClearCell(fromPos);
+            RegisterObject(movingObject, toPos);
+            movingObject.CurrentGridPosition = toPos;
+
+            // Şimdi yeni yerinden etrafına bak, zincir var mı?
+            List<MergeableObject> mergeGroup = FindMergeGroup(toPos, movingObject.ItemData);
+
+            if (mergeGroup.Count >= 3)
+            {
+                PerformMerge(mergeGroup, toPos);
+            }
+            else
+            {
+                // Merge yok, sadece yerine oturt
+                SnapObjectToPosition(movingObject, toPos);
+            }
         }
     }
 
-    private void PerformMerge(MergeableObject droppedObject, List<MergeableObject> neighbors, Vector2Int mergePos)
+    private void PerformMerge(List<MergeableObject> mergeGroup, Vector2Int mergeCenterPos)
     {
-        // 1. Yeni objenin verisini al
-        MergeableItemData nextLevelData = droppedObject.ItemData.NextLevelItem;
+        MergeableItemData nextLevelData = mergeGroup[0].ItemData.NextLevelItem;
+        if (nextLevelData == null) return;
 
-        // En yüksek seviyedeki bir objeyi birleştirmeye çalışıyorsak (NextLevelItem = null)
-        // merge işlemini iptal et ve objeyi eski yerine yolla (veya en yakın boşluğa)
-        if (nextLevelData == null)
+        // Gruptaki TÜM objeleri yok et (Zincirdeki herkes gider)
+        foreach (var obj in mergeGroup)
         {
-            SnapObjectToPosition(droppedObject, droppedObject.CurrentGridPosition);
-            return;
+            ClearCell(obj.CurrentGridPosition);
+            Destroy(obj.gameObject);
         }
 
-        // 2. Eski objeleri yok et
-        // Önce bırakılanı yok et
-        ClearCell(droppedObject.CurrentGridPosition);
-        Destroy(droppedObject.gameObject);
-
-        // Sonra komşuları yok et
-        foreach (var neighbor in neighbors)
+        // Yeni objeyi yarat
+        // Tile'ın pozisyonunu güvenli şekilde al
+        if (grid[mergeCenterPos.x, mergeCenterPos.y].TileView != null)
         {
-            ClearCell(neighbor.CurrentGridPosition);
-            Destroy(neighbor.gameObject);
+            Vector3 spawnPos = grid[mergeCenterPos.x, mergeCenterPos.y].TileView.GetWorldPosition();
+            GameObject newObj = Instantiate(nextLevelData.Prefab, spawnPos, Quaternion.identity);
+
+            MergeableObject newMergeable = newObj.GetComponent<MergeableObject>();
+            if (newMergeable != null)
+            {
+                newMergeable.CurrentGridPosition = mergeCenterPos;
+                RegisterObject(newMergeable, mergeCenterPos);
+
+                // YENİ EKLENTİ: Yaratılan objenin zincirleme reaksiyon yaratma ihtimali (Combo)
+                // İleride buraya "CheckForCombo(newMergeable)" ekleyebiliriz.
+            }
         }
-
-        // 3. Yeni objeyi yarat (Instantiate)
-        GameObject newObjectInstance = Instantiate(
-            nextLevelData.Prefab,
-            grid[mergePos.x, mergePos.y].TileView.GetWorldPosition(), // Tile'ın merkezine koy
-            Quaternion.identity
-        );
-
-        // 4. Yeni objeyi grid'e kaydet
-        MergeableObject newMergeable = newObjectInstance.GetComponent<MergeableObject>();
-        newMergeable.CurrentGridPosition = mergePos; // Pozisyonunu set et
-        RegisterObject(newMergeable, mergePos); // Grid'e kaydet
     }
 
     private void MoveObject(MergeableObject obj, Vector2Int fromPos, Vector2Int toPos)
@@ -163,33 +179,54 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    // Verilen pozisyonun 4 komşusunu (K, G, D, B) kontrol eder
-    // ve merge için uygun olanları (aynı ItemData'ya sahip) döndürür.
-    private List<MergeableObject> FindNeighborsToMerge(Vector2Int pos, MergeableItemData itemData)
+    // YENİ FONKSİYON: Sadece yanındakine değil, tüm zincire bakar (Recursive/Queue)
+    private List<MergeableObject> FindMergeGroup(Vector2Int startPos, MergeableItemData targetData)
     {
-        List<MergeableObject> neighbors = new List<MergeableObject>();
+        List<MergeableObject> group = new List<MergeableObject>();
+        HashSet<Vector2Int> visited = new HashSet<Vector2Int>(); // Ziyaret edilenleri not et (Sonsuz döngü olmasın)
+        Queue<Vector2Int> toCheck = new Queue<Vector2Int>(); // Kontrol edilecekler kuyruğu
 
-        Vector2Int[] directions = {
-            Vector2Int.up,    // (0, 1)
-            Vector2Int.down,  // (0, -1)
-            Vector2Int.left,  // (-1, 0)
-            Vector2Int.right  // (1, 0)
-        };
+        // Aramaya başlanacak noktayı ekle
+        toCheck.Enqueue(startPos);
+        visited.Add(startPos);
 
-        foreach (var dir in directions)
+        while (toCheck.Count > 0)
         {
-            Vector2Int neighborPos = pos + dir;
-            if (IsValidPosition(neighborPos))
+            Vector2Int current = toCheck.Dequeue();
+            MergeableObject obj = grid[current.x, current.y].ObjectOnTile;
+
+            // Eğer bu karedeki obje aradığımız tipteyse gruba al
+            // (Başlangıç noktası boş olsa bile komşularına bakmak için devam etmeliyiz)
+            if (obj != null && obj.ItemData == targetData)
             {
-                MergeableObject neighborObj = grid[neighborPos.x, neighborPos.y].ObjectOnTile;
-                // Komşu boş değilse VE ItemData'sı bizimkiyle aynıysa
-                if (neighborObj != null && neighborObj.ItemData == itemData)
+                group.Add(obj);
+            }
+            // Eğer burası boşsa veya farklı tipteyse ve burası BAŞLANGIÇ NOKTASI DEĞİLSE, zincir kopmuştur.
+            else if (current != startPos)
+            {
+                continue;
+            }
+
+            // 4 Yöne Bak (Zinciri takip et)
+            Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+            foreach (var dir in directions)
+            {
+                Vector2Int neighborPos = current + dir;
+
+                // Geçerli mi ve daha önce bakmadık mı?
+                if (IsValidPosition(neighborPos) && !visited.Contains(neighborPos))
                 {
-                    neighbors.Add(neighborObj);
+                    // Sadece DOLU ve AYNI TİP olan komşuları kuyruğa ekle ki arama orada devam etsin
+                    MergeableObject neighborObj = grid[neighborPos.x, neighborPos.y].ObjectOnTile;
+                    if (neighborObj != null && neighborObj.ItemData == targetData)
+                    {
+                        visited.Add(neighborPos);
+                        toCheck.Enqueue(neighborPos);
+                    }
                 }
             }
         }
-        return neighbors;
+        return group;
     }
 
     // Bir pozisyonun grid sınırları içinde olup olmadığını kontrol eder.
