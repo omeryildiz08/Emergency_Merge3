@@ -2,12 +2,11 @@ using UnityEngine;
 
 public class GridTileView : MonoBehaviour
 {
-    // Bu tile'ın grid koordinatını tutar (örn: [2, 3])
+    
     public Vector2Int GridPosition;
     public float objectYOffset = 0.8f;
     void Start()
     {
-        // 1. GridManager'ı bul (Singleton olduğu için böyle erişebiliriz)
         GridManager gridManager = GridManager.Instance;
 
         if (gridManager == null)
@@ -24,11 +23,11 @@ public class GridTileView : MonoBehaviour
         //    Mathf.RoundToInt(transform.position.z)
         //);
 
-        // 3. Kendini GridManager'a kaydet.
+       
         gridManager.RegisterTile(this, GridPosition);
     }
 
-    // Üzerine bir obje oturtulacağı zaman merkez pozisyonunu döndürür.
+   
     public Vector3 GetWorldPosition()
     {
         return new Vector3(

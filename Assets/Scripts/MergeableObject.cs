@@ -21,10 +21,10 @@ public class MergeableObject : MonoBehaviour
         gridManager = GridManager.Instance;
         mainCamera = Camera.main;
 
-        // 1. Başlangıç pozisyonunu bul
+        
         CurrentGridPosition = gridManager.WorldToGridPosition(transform.position);
 
-        // 2. Kendini GridManager'ın mantıksal grid'ine kaydet
+        
         gridManager.RegisterObject(this, CurrentGridPosition);
     }
 
@@ -65,10 +65,10 @@ public class MergeableObject : MonoBehaviour
             worldPositionOnDrop = ray.GetPoint(distance);
         }
 
-        // 2. Bu dünya pozisyonunu en yakın grid koordinatına çevir
+        
         Vector2Int toPos = gridManager.WorldToGridPosition(worldPositionOnDrop);
 
-        // 3. GridManager'a "Ben bu objeyi 'CurrentGridPosition'dan
+        //GridManager'a "Ben bu objeyi 'CurrentGridPosition'dan
         // 'toPos'a bırakıyorum, birleşme mi olacak, taşıma mı, karar ver" de.
         gridManager.TryMergeOrPlace(this, CurrentGridPosition, toPos);
     }
