@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class GridManager : MonoBehaviour
@@ -13,6 +14,7 @@ public class GridManager : MonoBehaviour
    
     public GridTileData[,] grid;
 
+    public event Action<MergeableItemData> OnMergeCompleted;
     private void Awake()
     {
         
@@ -134,8 +136,10 @@ public class GridManager : MonoBehaviour
                 RegisterObject(newMergeable, mergeCenterPos);
 
                 
-                // İleride buraya "CheckForCombo(newMergeable)" ekleyebiliriz.
+                // İleride 
+                // buraya "CheckForCombo(newMergeable)" ekleyebiliriz.
             }
+            OnMergeCompleted?.Invoke(newMergeable.ItemData);
         }
     }
 
