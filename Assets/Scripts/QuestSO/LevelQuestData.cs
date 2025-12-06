@@ -21,7 +21,7 @@ public class LevelQuestData : ScriptableObject
 
     public MergeableItemData TargetItem;
 
-    // Kaç tane lazım? (Veya Limit ise kaç hamle?)
+    
     public int RequiredAmount = 1;
     
 }

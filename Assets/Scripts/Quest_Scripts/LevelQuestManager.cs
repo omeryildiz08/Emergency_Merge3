@@ -4,18 +4,18 @@ using UnityEngine;
 public class LevelQuestManager : MonoBehaviour
 {
     [Header("Level Ayarları")]
-    public List<LevelQuestData> LevelQuests; // Editörden bu levelin görevlerini sürükle
+    public List<LevelQuestData> LevelQuests; 
     
     [Header("UI Referansları")]
-    public Transform QuestContainer; // UI'da Layout Group olan obje
-    public GameObject QuestUIPrefab; // Yukarıdaki scriptin olduğu prefab
+    public Transform QuestContainer; 
+    public GameObject QuestUIPrefab; 
 
    
     private List<QuestUI_Item> activeQuestUIs = new List<QuestUI_Item>();
 
     void Start()
     {
-        // 1. UI'ı oluştur
+        
         foreach (var quest in LevelQuests)
         {
             GameObject uiObj = Instantiate(QuestUIPrefab, QuestContainer);
@@ -24,7 +24,7 @@ public class LevelQuestManager : MonoBehaviour
             activeQuestUIs.Add(uiScript);
         }
 
-        // 2. GridManager'ı dinlemeye başla
+        // GridManager'ı dinlemeye başla
         if (GridManager.Instance != null)
         {
             GridManager.Instance.OnMergeCompleted += HandleMergeEvent;

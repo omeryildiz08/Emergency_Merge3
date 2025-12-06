@@ -7,11 +7,11 @@ using TMPro;
 public class QuestUI_Item : MonoBehaviour
 {
     [Header("UI Bağlantıları")]
-    public Image IconImage;           // Soldaki Yıldız
+    public Image IconImage;          
     public GameObject DescriptionPanel; // Açılan balon (Card)
     public TextMeshProUGUI DescriptionText;
-    public TextMeshProUGUI ProgressText; // "1/5" gibi
-    public GameObject Checkmark;      // Görev bitince çıkan tik işareti
+    public TextMeshProUGUI ProgressText; 
+    public GameObject Checkmark;      
     private LevelQuestData myQuestData;
     private int currentAmount;
     private bool isCompleted = false;
@@ -32,6 +32,7 @@ public class QuestUI_Item : MonoBehaviour
     {
         bool isActive = DescriptionPanel.activeSelf;
         DescriptionPanel.SetActive(!isActive);
+        Debug.Log("görev tab açıldı");
     }
 
     public void AddProgress(int amount)
@@ -39,10 +40,12 @@ public class QuestUI_Item : MonoBehaviour
         if (isCompleted) return;
 
         currentAmount += amount;
+        Debug.Log($"Görev ilerlemesi: {currentAmount}/{myQuestData.RequiredAmount}");
         UpdateProgressText();
 
         if (currentAmount >= myQuestData.RequiredAmount)
         {
+            Debug.Log("Görev tamamlandı");
             CompleteQuest();
         }
     }
@@ -57,7 +60,7 @@ public class QuestUI_Item : MonoBehaviour
         isCompleted = true;
         Checkmark.SetActive(true);
         ProgressText.text = "TAMAMLANDI";
-        // Burada bir ses veya efekt çalabilirsin
+        // Burada bir ses veya efekt çalabilir
     }
 
     public LevelQuestData GetQuestData() { return myQuestData; }
