@@ -139,6 +139,7 @@ public class GridManager : MonoBehaviour
                 // İleride 
                 // buraya "CheckForCombo(newMergeable)" ekleyebiliriz.
             }
+            UnlockTile(mergeCenterPos);
             OnMergeCompleted?.Invoke(newMergeable.ItemData);
         }
     }
@@ -228,5 +229,22 @@ public class GridManager : MonoBehaviour
             Mathf.RoundToInt(worldPosition.x),
             Mathf.RoundToInt(worldPosition.z)
         );
+    }
+
+    public bool IsTileLocked(Vector2Int pos)
+    {
+        if(!IsValidPosition(pos)) return false;
+        return grid[pos.x, pos.y].isLocked;
+    }
+
+    public void UnlockTile(Vector2Int pos)
+    {
+        if(!IsValidPosition(pos)) return;
+        grid[pos.x, pos.y].isLocked = false;
+        
+        if(grid[pos.x, pos.y].TileView != null)
+        {
+            grid[pos.x, pos.y].TileView.UpdateVisuals(false);
+        }
     }
 }

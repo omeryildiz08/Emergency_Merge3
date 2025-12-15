@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridTileView : MonoBehaviour
@@ -5,6 +6,13 @@ public class GridTileView : MonoBehaviour
     
     public Vector2Int GridPosition;
     public float objectYOffset = 0.8f;
+    [Header("Kilit Ayarları")]
+    public bool StartLocked = false;//bunu işaretlersen kilitli başlar
+    public MeshRenderer MyMeshRenderer; //renk burdan değişecek
+    public Material LockedMaterial;
+    public Material NormalMaterial;
+
+
     void Start()
     {
         GridManager gridManager = GridManager.Instance;
@@ -15,9 +23,7 @@ public class GridTileView : MonoBehaviour
             return;
         }
 
-        //// 2. Kendi dünya pozisyonunu (transform.position) grid koordinatına çevir.
-        //// Elle yerleştirirken (0,0,0), (1,0,0) gibi tam sayılara koyduğun için
-        //// bu yuvarlama işlemi mükemmel çalışacaktır.
+      
         //GridPosition = new Vector2Int(
         //    Mathf.RoundToInt(transform.position.x),
         //    Mathf.RoundToInt(transform.position.z)
@@ -25,6 +31,15 @@ public class GridTileView : MonoBehaviour
 
        
         gridManager.RegisterTile(this, GridPosition);
+        if (StartLocked)
+        {
+            gridManager.grid[GridPosition.x, GridPosition.y].isLocked = true;
+            UpdateVisuals(true);
+        }
+        else
+        {
+            UpdateVisuals(false);
+        }
     }
 
    
@@ -35,5 +50,13 @@ public class GridTileView : MonoBehaviour
             transform.position.y + objectYOffset, // Tile'ın Y'sine offset ekle
             transform.position.z
         );
+    }
+
+    public void UpdateVisuals(bool isLocked)
+    {
+        if(MyMeshRenderer != null && LockedMaterial != null && NormalMaterial != null)
+        {
+            MyMeshRenderer.material = isLocked ? LockedMaterial : NormalMaterial;
+        }
     }
 }

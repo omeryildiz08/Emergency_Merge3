@@ -123,6 +123,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!23 &127703941 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4398831924363616804, guid: 2c64742002cae1c48820bf13473d4f81, type: 3}
+  m_PrefabInstance: {fileID: 618256202}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &153805801
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -675,6 +680,10 @@ PrefabInstance:
       value: Tile (6)
       objectReference: {fileID: 0}
     - target: {fileID: 6495463873739162471, guid: 2c64742002cae1c48820bf13473d4f81, type: 3}
+      propertyPath: StartLocked
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6495463873739162471, guid: 2c64742002cae1c48820bf13473d4f81, type: 3}
       propertyPath: GridPosition.x
       value: 2
       objectReference: {fileID: 0}
@@ -682,6 +691,18 @@ PrefabInstance:
       propertyPath: GridPosition.y
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6495463873739162471, guid: 2c64742002cae1c48820bf13473d4f81, type: 3}
+      propertyPath: LockedMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 120c2c184fa3a7e4fac538ee3d4316e7, type: 2}
+    - target: {fileID: 6495463873739162471, guid: 2c64742002cae1c48820bf13473d4f81, type: 3}
+      propertyPath: MyMeshRenderer
+      value: 
+      objectReference: {fileID: 127703941}
+    - target: {fileID: 6495463873739162471, guid: 2c64742002cae1c48820bf13473d4f81, type: 3}
+      propertyPath: NormalMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 41668693f41613348a2ed55137a930fa, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2c64742002cae1c48820bf13473d4f81, type: 3}
 --- !u!1 &643136394

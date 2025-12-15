@@ -30,6 +30,12 @@ public class MergeableObject : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (gridManager.IsTileLocked(CurrentGridPosition))
+        {
+            Debug.Log("Bu obje kilitli sürüklenemez");
+            return;
+            //buraya animasyon veya ses gelebilir
+        }
         isDragging = true;
         
         transform.position += new Vector3(0, dragYOffset, 0);
