@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d7804807fbba704e841bbce9200c116, type: 3}
   m_Name: Tomurcuk_L1
   m_EditorClassIdentifier: 
+  ItemID: testobj_1_L1
   ItemName: TomurcukL1
   Level: 1
   Prefab: {fileID: 1249829547648385719, guid: 678eb95e11ec6d54fbc3d4c2cd2d877c, type: 3}
   NextLevelItem: {fileID: 11400000, guid: 0f4b17cc5b1d59f448bcde79f37b9528, type: 2}
+  SellPrice: 0
+  BuyPrice: 0
+  FacilityPoint: 0

@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d7804807fbba704e841bbce9200c116, type: 3}
   m_Name: CicekL2
   m_EditorClassIdentifier: 
+  ItemID: testobj_1_L2
   ItemName: CicekL2
   Level: 2
   Prefab: {fileID: 8485471466194350506, guid: 9286ebd6bc9addc48aac57f2c6711752, type: 3}
   NextLevelItem: {fileID: 11400000, guid: 34f3284a1bdbba24c95ca6d9f6e758f2, type: 2}
+  SellPrice: 0
+  BuyPrice: 0
+  FacilityPoint: 0

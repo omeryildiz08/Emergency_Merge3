@@ -143,11 +143,15 @@ public class GridManager : MonoBehaviour
                 newMergeable.CurrentGridPosition = mergeCenterPos;
                 RegisterObject(newMergeable, mergeCenterPos);
 
-                
+                 OnMergeCompleted?.Invoke(newMergeable.ItemData);
                 // İleride 
                 // buraya "CheckForCombo(newMergeable)" ekleyebiliriz.
             }
-            OnMergeCompleted?.Invoke(newMergeable.ItemData);
+            else
+            {
+                Debug.LogError("Yeni oluşturulan obje üzerinde MergeableObject bileşeni bulunamadı!");
+            }
+           
         }
     }
 

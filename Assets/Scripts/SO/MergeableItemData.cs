@@ -6,6 +6,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New MergeableItem", menuName = "Merge Game/Mergeable Item")]
 public class MergeableItemData : ScriptableObject
 {
+   [Header("Save ve Yükleme İçin Benzersiz ID")]
+    public string ItemID; // Her eşya için benzersiz ID
+
     [Header ("Temel Bilgiler")]
     public string ItemName;
 

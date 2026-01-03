@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d7804807fbba704e841bbce9200c116, type: 3}
   m_Name: BuyukCicek_L3
   m_EditorClassIdentifier: 
+  ItemID: testobj_1_L3
   ItemName: "B\xFCy\xFCkL3"
   Level: 3
   Prefab: {fileID: 4691036381486678106, guid: ab6919dafd736724898556e8b81a6d89, type: 3}
   NextLevelItem: {fileID: 0}
+  SellPrice: 0
+  BuyPrice: 0
+  FacilityPoint: 0
