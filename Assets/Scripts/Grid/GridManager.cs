@@ -60,8 +60,14 @@ public class GridManager : MonoBehaviour
   
     public void TryMergeOrPlace(MergeableObject movingObject, Vector2Int fromPos, Vector2Int toPos)
     {
+        if (movingObject == null) return;
        
         if (!IsValidPosition(toPos) || grid[toPos.x, toPos.y].TileView == null)
+        {
+            SnapObjectToPosition(movingObject, fromPos);
+            return;
+        }
+        if (IsTileLocked(toPos))
         {
             SnapObjectToPosition(movingObject, fromPos);
             return;
@@ -113,12 +119,14 @@ public class GridManager : MonoBehaviour
 
     private void PerformMerge(List<MergeableObject> mergeGroup, Vector2Int mergeCenterPos)
     {
+        if (mergeGroup == null || mergeGroup.Count == 0) return;
         MergeableItemData nextLevelData = mergeGroup[0].ItemData.NextLevelItem;
         if (nextLevelData == null) return;
 
-        
         foreach (var obj in mergeGroup)
         {
+            if (obj == null) continue;
+            UnlockTile(obj.CurrentGridPosition);
             ClearCell(obj.CurrentGridPosition);
             Destroy(obj.gameObject);
         }
@@ -139,7 +147,6 @@ public class GridManager : MonoBehaviour
                 // İleride 
                 // buraya "CheckForCombo(newMergeable)" ekleyebiliriz.
             }
-            UnlockTile(mergeCenterPos);
             OnMergeCompleted?.Invoke(newMergeable.ItemData);
         }
     }
@@ -218,7 +225,7 @@ public class GridManager : MonoBehaviour
         }
         return group;
     }
-    private bool IsValidPosition(Vector2Int pos)
+    public bool IsValidPosition(Vector2Int pos)
     {
         return pos.x >= 0 && pos.x < gridWidth &&
                pos.y >= 0 && pos.y < gridHeight;

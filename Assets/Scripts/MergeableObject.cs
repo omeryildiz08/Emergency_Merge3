@@ -20,6 +20,12 @@ public class MergeableObject : MonoBehaviour
     {
         gridManager = GridManager.Instance;
         mainCamera = Camera.main;
+        if (gridManager == null || mainCamera == null)
+        {
+            Debug.LogError("MergeableObject missing GridManager or Camera.main");
+            enabled = false;
+            return;
+        }
 
         
         CurrentGridPosition = gridManager.WorldToGridPosition(transform.position);

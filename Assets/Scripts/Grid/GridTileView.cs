@@ -22,6 +22,11 @@ public class GridTileView : MonoBehaviour
             Debug.LogError("Sahnede GridManager bulunamadı!");
             return;
         }
+        if (!gridManager.IsValidPosition(GridPosition))
+        {
+            Debug.LogError($"GridPosition gecersiz: {GridPosition}");
+            return;
+        }
 
       
         //GridPosition = new Vector2Int(
